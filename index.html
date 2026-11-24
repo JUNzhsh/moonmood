@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e4eacc">
+  <meta name="description" content="MoonMood 像素风经期手账，记录流量、症状和用药。">
+  <meta name="apple-mobile-web-app-title" content="MoonMood">
+  <title>MoonMood · 经期手账</title>
+  <link rel="icon" href="./assets/moon.png" type="image/png">
+  <link rel="apple-touch-icon" href="./assets/moon.png">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <main id="lock-view" class="lock-view">
+    <div class="console">
+      <div class="console-top" aria-hidden="true"><i></i><span></span><i></i></div>
+      <div class="bezel">
+        <div class="bezel-top" aria-hidden="true"><span class="power"></span><span class="bezel-line"></span></div>
+        <form id="unlock-form" class="lcd">
+          <div class="lock-moon" aria-hidden="true"><i class="pixel-moon"></i><i class="sparkle"></i><i class="sparkle tiny"></i></div>
+          <h1 class="pixel">MOONMOOD</h1>
+          <label for="pin">输入四位密码</label>
+          <div class="pin-pad">
+            <input id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-describedby="pin-error" required>
+            <div class="pin-slots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          </div>
+          <p id="pin-error" class="pin-error" role="status"></p>
+          <button class="button primary start" type="submit"><span class="triangle"></span><span class="pixel">START</span><span>进入</span></button>
+        </form>
+        <div class="bezel-bottom" aria-hidden="true"></div>
+      </div>
+      <div class="console-bottom" aria-hidden="true"><span></span><div class="grille"><i></i><i></i><i></i><i></i><i></i></div></div>
+    </div>
+  </main>
+
+  <div id="app-view" class="app-view" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true"><i class="pixel-moon"></i></div>
+        <div><div class="brand-name pixel">MOONMOOD</div><div class="brand-caption">经期手账</div></div>
+      </div>
+      <button id="lock-button" class="button quiet" type="button"><i class="lock-icon" aria-hidden="true"></i>锁定</button>
+    </header>
+
+    <main id="dashboard" class="dashboard">
+      <div class="page-heading">
+        <h1 tabindex="-1">我的周期</h1>
+        <button id="today-button" class="today-button" type="button" aria-label="返回本月"></button>
+      </div>
+      <div class="dashboard-grid">
+        <section class="calendar panel" aria-labelledby="calendar-title">
+          <div class="panel-header"><h2 id="calendar-title">日历</h2><span class="lcd-bars" aria-hidden="true"></span></div>
+          <div class="calendar-content">
+            <div class="calendar-nav">
+              <button id="previous-month" class="button square" type="button" aria-label="上个月"><i class="arrow left" aria-hidden="true"></i></button>
+              <h3 id="month-title" class="pixel" aria-live="polite"></h3>
+              <button id="next-month" class="button square" type="button" aria-label="下个月"><i class="arrow" aria-hidden="true"></i></button>
+            </div>
+            <div class="calendar-week" aria-hidden="true"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+            <div id="calendar-days" class="calendar-days"></div>
+            <div class="calendar-legend"><span><i class="period-key"></i>经期</span><span><i class="record-key"></i>有记录</span></div>
+          </div>
+        </section>
+
+        <section class="records panel" aria-labelledby="records-title">
+          <div class="records-header">
+            <div><h2 id="records-title">记录</h2><p id="record-count" class="record-count"></p></div>
+            <button id="add-button" class="button primary pixel" type="button" aria-label="添加记录">+ Add</button>
+          </div>
+          <div id="record-list" class="record-list"></div>
+        </section>
+      </div>
+      <p id="dashboard-status" class="dashboard-status" role="status"></p>
+    </main>
+
+    <main id="editor" class="editor" hidden>
+      <button id="back-button" class="button quiet back" type="button"><i class="arrow left" aria-hidden="true"></i>返回记录</button>
+      <section class="panel editor-panel" aria-labelledby="editor-title">
+        <div class="panel-header"><h1 id="editor-title" tabindex="-1"></h1><span class="lcd-bars" aria-hidden="true"></span></div>
+        <form id="record-form" class="editor-form">
+          <div class="entry-basics">
+            <label class="date-field" for="entry-date">日期<input id="entry-date" type="date" required></label>
+            <fieldset class="flow-field">
+              <legend>月经量</legend>
+              <div id="flow-options" class="flow-options"></div>
+            </fieldset>
+          </div>
+          <fieldset class="option-group">
+            <legend>症状</legend>
+            <div id="symptom-options" class="chips"></div>
+          </fieldset>
+          <fieldset class="option-group">
+            <legend>用药</legend>
+            <div id="medicine-options" class="chips"></div>
+          </fieldset>
+          <p id="entry-error" class="entry-error" role="status"></p>
+          <div class="editor-actions">
+            <button id="cancel-button" class="button" type="button">取消</button>
+            <button class="button primary" type="submit">保存记录</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <template id="empty-records">
+    <div class="empty">
+      <div class="empty-moon" aria-hidden="true"><i class="pixel-moon"></i><i class="sparkle"></i><i class="sparkle tiny"></i></div>
+      <p>这个月还没有记录</p>
+    </div>
+  </template>
+  <noscript><p class="noscript">请启用 JavaScript 以使用 MoonMood。</p></noscript>
+</body>
+</html>
