@@ -156,14 +156,15 @@ function renderCalendar() {
     date.setDate(first.getDate() + offset);
     const key = dateKey(date);
     const entry = journal.entries[key];
+    const hasFlow = entry?.flow > 0;
     const button = element("button", "day", date.getDate());
     button.type = "button";
     button.classList.toggle("adjacent", date.getMonth() !== month);
-    button.classList.toggle("period", Boolean(entry?.flow));
+    button.classList.toggle("period", hasFlow);
     button.classList.toggle("today", key === today);
     button.classList.toggle("logged", Boolean(entry));
     if (key === today) button.setAttribute("aria-current", "date");
-    const state = entry?.flow ? `经期，${entry.flow} 滴` : entry ? "有记录" : "添加记录";
+    const state = hasFlow ? `经期，${entry.flow} 滴` : entry ? "有记录" : "添加记录";
     button.setAttribute("aria-label", `${key}，${state}`);
     button.addEventListener("click", () => openEditor(key));
     days.append(button);
@@ -185,14 +186,17 @@ function renderRecord(key, entry) {
   button.append(editMark);
   button.addEventListener("click", () => openEditor(key));
 
-  const flow = element("div", "record-flow");
-  for (let level = 1; level <= 4; level += 1) {
-    const drop = element("i", level <= entry.flow ? "drop" : "drop off");
-    drop.setAttribute("aria-hidden", "true");
-    flow.append(drop);
+  head.append(button);
+  if (entry.flow > 0) {
+    const flow = element("div", "record-flow");
+    for (let level = 1; level <= 4; level += 1) {
+      const drop = element("i", level <= entry.flow ? "drop" : "drop off");
+      drop.setAttribute("aria-hidden", "true");
+      flow.append(drop);
+    }
+    flow.append(element("span", "", `${entry.flow} 滴`));
+    head.append(flow);
   }
-  flow.append(element("span", "", `${entry.flow} 滴`));
-  head.append(button, flow);
 
   const details = element("dl");
   details.style.margin = "0";
