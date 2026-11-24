@@ -13,17 +13,24 @@ function compareValue(first, second) {
   return JSON.stringify(first) === JSON.stringify(second);
 }
 
-export function saveJournalEntry(journal, originalDate, date, entry) {
+function nextRevision(journal) {
   const sync = journal.sync ??= { clock: 0, revisions: {} };
   sync.clock = Math.max(Date.now(), sync.clock + 1);
-  const stamp = `${String(sync.clock).padStart(16, "0")}:${crypto.randomUUID()}`;
-  const previous = journal.entries[date];
-  const revisions = sync.revisions[date] ??= {};
+  return `${String(sync.clock).padStart(16, "0")}:${crypto.randomUUID()}`;
+}
 
-  if (originalDate && originalDate !== date) {
-    sync.revisions[originalDate] = { removed: stamp };
-    delete journal.entries[originalDate];
-  }
+export function deleteJournalEntry(journal, date) {
+  const removed = nextRevision(journal);
+  journal.sync.revisions[date] = { removed };
+  delete journal.entries[date];
+}
+
+export function saveJournalEntry(journal, originalDate, date, entry) {
+  if (originalDate && originalDate !== date) deleteJournalEntry(journal, originalDate);
+  const stamp = nextRevision(journal);
+  const previous = journal.entries[date];
+  const revisions = journal.sync.revisions[date] ??= {};
+
   for (const field of fields) {
     if (!previous || !compareValue(previous[field], entry[field])) {
       revisions[field] = stamp;
@@ -52,18 +59,19 @@ export function mergeJournals(local, remote) {
   ]);
 
   for (const date of days) {
-    const a = local.entries[date];
-    const b = remote?.entries[date];
     const aTags = localRevisions[date] ?? {};
     const bTags = remoteRevisions[date] ?? {};
     const removed = [aTags.removed ?? "", bTags.removed ?? ""].sort().at(-1);
+    // A device must have seen the deletion before it can recreate this date.
+    const a = !removed || aTags.removed === removed ? local.entries[date] : undefined;
+    const b = !removed || bTags.removed === removed ? remote?.entries[date] : undefined;
     const tags = removed ? { removed } : {};
     const entry = { flow: 0, symptoms: [], medicines: [] };
     let hasEntry = false;
 
     for (const field of fields) {
-      const left = aTags[field] ?? "";
-      const right = bTags[field] ?? "";
+      const left = a ? aTags[field] ?? "" : "";
+      const right = b ? bTags[field] ?? "" : "";
       const newest = left > right ? left : right;
       if (removed && newest <= removed) continue;
 

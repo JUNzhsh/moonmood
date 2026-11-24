@@ -171,20 +171,6 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
   --dot-size: calc(var(--dot-step) * .71);
 }
 .wordmark-dots { display: flex; align-items: center; gap: var(--dot-step); }
-.wordmark-phase {
-  --phase-pixel: 2px;
-  display: block;
-  flex: none;
-  width: calc(var(--phase-pixel) * 22);
-  height: calc(var(--phase-pixel) * 16);
-  margin-inline-start: 6px;
-  background: url("./assets/moon-phases.png") 0 0 / auto 100% no-repeat;
-  image-rendering: pixelated;
-  animation: moon-phase 7s steps(10, end) infinite;
-}
-@keyframes moon-phase {
-  to { background-position-x: calc(var(--phase-pixel) * -220); }
-}
 .dot-letter {
   display: block;
   width: calc(var(--dot-step) * 5);
@@ -316,6 +302,8 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 .entry-error { color: #803f37; font-size: 0.8125rem; margin-top: 13px; }
 .entry-error:empty { display: none; }
 .editor-actions { display: flex; justify-content: flex-end; gap: 10px; border-top: var(--hairline) solid var(--soft-line); margin-top: 22px; padding-top: 15px; }
+.editor-actions .danger { margin-inline-end: auto; color: #803f37; border-color: #a56c64; }
+.editor-actions .danger:hover { background: #f5eae4; }
 .noscript { padding: 16px; text-align: center; }
 
 .sync-button { min-height: 29px; padding: 3px 9px; font-size: 1.0625rem; }
@@ -348,7 +336,6 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 @media (max-width: 380px) {
   .console { padding-inline: 16px; }
   .bezel { padding-inline: 7px; }
-  .lcd .wordmark-phase { --phase-pixel: 1.5px; }
   .record-date { font-size: 1.125rem; }
 }
 @media (prefers-reduced-motion: reduce) {

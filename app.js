@@ -1,4 +1,4 @@
-import { createJournalSync, createPairingCode, normalizePairingCode, saveJournalEntry } from "./journal-sync.js?v=1";
+import { createJournalSync, createPairingCode, deleteJournalEntry, normalizePairingCode, saveJournalEntry } from "./journal-sync.js?v=2";
 
 const STORAGE_KEY = "moonmood:journal:v1";
 const PAIRING_KEY = "moonmood:sync-code:v1";
@@ -50,7 +50,7 @@ for (const wordmark of document.querySelectorAll(".wordmark")) {
   });
   const display = element("span", "wordmark-dots");
   display.setAttribute("aria-hidden", "true");
-  display.append(...letters, element("span", "wordmark-phase"));
+  display.append(...letters);
   wordmark.setAttribute("aria-label", name);
   wordmark.replaceChildren(display);
 }
@@ -408,6 +408,7 @@ function openEditor(key) {
     custom: Object.fromEntries(groups.map(({ key }) => [key, [...journal.custom[key]]])),
   };
   get("editor-title").textContent = recorded ? "编辑记录" : "添加记录";
+  get("delete-button").hidden = !recorded;
   entryDate.value = key;
   flowOptions.querySelector(`[value="${recorded?.flow ?? 0}"]`).checked = true;
   entryError.textContent = "";
@@ -527,6 +528,30 @@ get("record-form").addEventListener("submit", (event) => {
   visibleMonth = calendarDate(key);
   returnToDashboard();
   dashboardStatus.textContent = "记录已保存。";
+  void syncJournal();
+});
+
+get("delete-button").addEventListener("click", () => {
+  const date = editing?.originalDate;
+  if (!date || !window.confirm(`删除 ${date.replaceAll("-", ".")} 的记录？已连接的设备也会同步删除。`)) return;
+
+  try {
+    const updated = readJournal();
+    if (JSON.stringify(updated.entries[date]) !== JSON.stringify(editing.originalEntry)) {
+      entryError.textContent = "这条记录已更新，请返回后重新打开。";
+      return;
+    }
+
+    deleteJournalEntry(updated, date);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    journal = updated;
+  } catch {
+    entryError.textContent = "删除失败，请检查浏览器的可用存储后重试。";
+    return;
+  }
+
+  returnToDashboard();
+  dashboardStatus.textContent = "记录已删除。";
   void syncJournal();
 });
 
