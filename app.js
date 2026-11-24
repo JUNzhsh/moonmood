@@ -50,7 +50,7 @@ for (const wordmark of document.querySelectorAll(".wordmark")) {
   });
   const display = element("span", "wordmark-dots");
   display.setAttribute("aria-hidden", "true");
-  display.append(...letters);
+  display.append(...letters, element("span", "wordmark-phase"));
   wordmark.setAttribute("aria-label", name);
   wordmark.replaceChildren(display);
 }

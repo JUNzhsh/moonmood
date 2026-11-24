@@ -166,8 +166,25 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 .topbar { display: flex; align-items: center; min-height: 74px; }
 .wordmark { --dot-step: 3.6px; --dot-size: 2.45px; color: var(--ink); }
 .wordmark:focus { outline: none; }
-.lcd .wordmark { --dot-step: 4.2px; --dot-size: 3px; }
-.wordmark-dots { display: flex; align-items: flex-start; gap: var(--dot-step); }
+.lcd .wordmark {
+  --dot-step: clamp(2.25px, 1.42vw - 1.32px, 4.2px);
+  --dot-size: calc(var(--dot-step) * .71);
+}
+.wordmark-dots { display: flex; align-items: center; gap: var(--dot-step); }
+.wordmark-phase {
+  --phase-pixel: 2px;
+  display: block;
+  flex: none;
+  width: calc(var(--phase-pixel) * 22);
+  height: calc(var(--phase-pixel) * 16);
+  margin-inline-start: 6px;
+  background: url("./assets/moon-phases.png") 0 0 / auto 100% no-repeat;
+  image-rendering: pixelated;
+  animation: moon-phase 7s steps(10, end) infinite;
+}
+@keyframes moon-phase {
+  to { background-position-x: calc(var(--phase-pixel) * -220); }
+}
 .dot-letter {
   display: block;
   width: calc(var(--dot-step) * 5);
@@ -230,8 +247,8 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 .records-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 17px 19px 15px; border-bottom: var(--hairline) solid var(--soft-line); background: #e5f2ed; }
 .records-header h2 { font-size: 1.3125rem; line-height: 1.2; }
 .record-count { margin-top: 5px; color: var(--muted); font-size: 0.75rem; }
-.records-header .primary { position: relative; font-size: 0.6875rem; width: 49px; min-height: 21px; padding: 2px 5px; }
-.records-header .primary::after { content: ""; position: absolute; inset: -12px 0; }
+.records-header .primary { position: relative; font-size: 0.859375rem; width: 61.25px; min-height: 26.25px; padding: 2px 5px; }
+.records-header .primary::after { content: ""; position: absolute; inset: -9px 0; }
 .record-list { padding: 13px 15px 15px; }
 .empty {
   display: grid;
@@ -253,7 +270,7 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 .record-date:hover { text-decoration: underline; text-decoration-thickness: var(--hairline); text-underline-offset: 3px; }
 .record-date .weekday { font-size: 0.75rem; font-weight: 400; color: var(--muted); }
 .edit-mark { display: inline-grid; place-items: center; width: 20px; height: 20px; color: var(--muted); font-size: 1rem; }
-.record-detail { display: grid; grid-template-columns: 2.9em minmax(0, 1fr); gap: 6px; color: var(--detail); font-size: 0.8125rem; line-height: 1.65; }
+.record-detail { display: grid; grid-template-columns: 2.9em minmax(0, 1fr); gap: 6px; color: var(--detail); font-size: 1.08333rem; line-height: 1.65; }
 .record-detail + .record-detail { margin-top: 4px; }
 .record-detail dd { margin: 0; overflow-wrap: anywhere; }
 .record-flow { display: flex; align-items: center; gap: 3px; font-size: 0.75rem; font-weight: 400; color: var(--muted); }
@@ -331,6 +348,7 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 @media (max-width: 380px) {
   .console { padding-inline: 16px; }
   .bezel { padding-inline: 7px; }
+  .lcd .wordmark-phase { --phase-pixel: 1.5px; }
   .record-date { font-size: 1.125rem; }
 }
 @media (prefers-reduced-motion: reduce) {
