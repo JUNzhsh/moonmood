@@ -9,8 +9,8 @@
   <title>MoonMood · 经期手账</title>
   <link rel="icon" href="./assets/moon.png" type="image/png">
   <link rel="apple-touch-icon" href="./assets/moon.png">
-  <link rel="stylesheet" href="./styles.css?v=2">
-  <script type="module" src="./app.js?v=2"></script>
+  <link rel="stylesheet" href="./styles.css?v=3">
+  <script type="module" src="./app.js?v=3"></script>
 </head>
 <body>
   <main id="lock-view" class="lock-view">
@@ -20,7 +20,7 @@
         <div class="bezel-top" aria-hidden="true"><span class="power"></span><span class="bezel-line"></span></div>
         <form id="unlock-form" class="lcd">
           <div class="lock-moon" aria-hidden="true"><i class="pixel-moon"></i><i class="sparkle"></i><i class="sparkle tiny"></i></div>
-          <h1>moonmood</h1>
+          <h1 class="wordmark">moonmood</h1>
           <label for="pin">输入四位密码</label>
           <div class="pin-pad">
             <input id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-describedby="pin-error" required>
@@ -36,13 +36,9 @@
   </main>
 
   <div id="app-view" class="app-view" hidden>
-    <header class="topbar"><span class="brand-name">moonmood</span></header>
+    <header class="topbar"><h1 id="brand-name" class="wordmark" tabindex="-1">moonmood</h1></header>
 
     <main id="dashboard" class="dashboard">
-      <div class="page-heading">
-        <h1 tabindex="-1">我的周期</h1>
-        <button id="today-button" class="today-button" type="button" aria-label="返回本月"></button>
-      </div>
       <div class="dashboard-grid">
         <section class="calendar panel" aria-labelledby="calendar-title">
           <div class="panel-header"><h2 id="calendar-title">日历</h2><span class="lcd-bars" aria-hidden="true"></span></div>
@@ -54,7 +50,10 @@
             </div>
             <div class="calendar-week" aria-hidden="true"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
             <div id="calendar-days" class="calendar-days"></div>
-            <div class="calendar-legend"><span><i class="period-key"></i>经期</span><span><i class="record-key"></i>有记录</span></div>
+            <div class="calendar-legend">
+              <span><i class="period-key"></i>经期</span><span><i class="record-key"></i>有记录</span>
+              <button id="today-button" class="today-button" type="button" aria-label="返回本月"></button>
+            </div>
           </div>
         </section>
 

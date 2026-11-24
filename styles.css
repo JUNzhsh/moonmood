@@ -1,3 +1,10 @@
+@font-face {
+  font-family: "MoonMood Dates";
+  src: url("./assets/moonmood-dates.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light;
   --background: #deeee9;
@@ -6,11 +13,13 @@
   --accent: #bee2d4;
   --ink: #24483f;
   --muted: #46685f;
+  --detail: #56736b;
   --line: #719189;
   --soft-line: #bbcfc9;
   --shadow: #55877924;
   --hairline: .34px;
   --outline: .67px;
+  --date-font: "MoonMood Dates", system-ui, sans-serif;
   font-size: 66.6667%;
   font-weight: 400;
   font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -145,12 +154,34 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 .grille i { width: 1.34px; height: 16px; background: #7a9d91; border-radius: 2px; box-shadow: inset 0 .67px #55796e; }
 
 .app-view { width: min(1136px, calc(100% - 64px)); margin: 0 auto; padding-bottom: 42px; }
-.topbar { display: flex; align-items: center; min-height: 63px; border-bottom: var(--outline) solid var(--line); }
-.brand-name { font-size: 1.8125rem; line-height: 1.2; font-weight: 400; letter-spacing: .035em; }
-.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 38px 0 18px; }
-.page-heading h1 { font-size: clamp(1.75rem, 3.33vw, 2.5rem); font-weight: 500; letter-spacing: -.015em; }
-.today-button { border: var(--hairline) solid #91ada4; background: #edf6f3; padding: 8px 10px; font-size: 1rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.topbar { display: flex; align-items: center; min-height: 74px; }
+.wordmark { --dot-step: 3.6px; --dot-size: 2.45px; color: var(--ink); }
+.wordmark:focus { outline: none; }
+.lcd .wordmark { --dot-step: 4.2px; --dot-size: 3px; }
+.wordmark-dots { display: flex; align-items: flex-start; gap: var(--dot-step); }
+.dot-letter {
+  display: block;
+  width: calc(var(--dot-step) * 5);
+  height: calc(var(--dot-step) * 7);
+  animation: wordmark-light 680ms ease-out backwards;
+  animation-delay: calc(var(--letter-index) * 55ms);
+}
+.dot-letter::before {
+  content: "";
+  display: block;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  box-shadow: var(--letter-dots);
+}
+@keyframes wordmark-light {
+  from { opacity: .18; transform: translateY(2px); }
+  60% { opacity: 1; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.today-button { min-height: 28px; margin-left: auto; border: var(--hairline) solid #91ada4; background: #edf6f3; padding: 3px 6px; font-size: 1.125rem; }
 .today-button:hover { background: #d6ebe3; }
+.today-button, .calendar-nav h3, .day, .record-date time, .date-field input { font-family: var(--date-font); font-weight: 400; }
 .dashboard-grid { display: grid; grid-template-columns: minmax(285px, 1fr) minmax(0, 2fr); align-items: start; gap: 20px; }
 .panel { border: var(--outline) solid var(--ink); background: var(--paper); box-shadow: 0 2px 7px var(--shadow); }
 .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 49px; padding: 9px 16px; border-bottom: var(--hairline) solid var(--soft-line); background: #e0f0ea; }
@@ -158,7 +189,7 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 .lcd-bars { width: 28px; height: 3px; background: repeating-linear-gradient(90deg, #8cb4a6 0 1.33px, transparent 1.33px 8px); }
 .calendar-content { padding: 14px 12px 13px; }
 .calendar-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 1px 12px; }
-.calendar-nav h3 { font-size: 1.5625rem; font-variant-numeric: tabular-nums; }
+.calendar-nav h3 { font-size: 1.6875rem; }
 .square { width: 37px; min-height: 35px; padding: 0; box-shadow: 0 .67px var(--shadow); }
 .calendar-week, .calendar-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; text-align: center; }
 .calendar-week { margin-bottom: 4px; color: var(--muted); font-size: 0.6875rem; font-weight: 400; }
@@ -173,17 +204,15 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
   padding: 0;
   border: var(--hairline) solid transparent;
   background: transparent;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.125rem;
   line-height: 1;
-  font-variant-numeric: tabular-nums;
 }
 .day.adjacent { color: #58796f; opacity: .67; }
 .day.period { background: #a9d8c8; color: #24483f; opacity: 1; }
 .day.today { border: var(--hairline) dashed #618b7e; }
 .day.logged::after { content: ""; position: absolute; bottom: 3px; width: 3px; height: 3px; background: #517b6d; }
 .day:hover { border-color: var(--line); background: #d7ebe3; }
-.calendar-legend { display: flex; flex-wrap: wrap; gap: 15px; padding-top: 12px; color: var(--muted); font-size: 0.6875rem; }
+.calendar-legend { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 13px; padding-top: 9px; color: var(--muted); font-size: 0.6875rem; }
 .calendar-legend span { display: flex; align-items: center; gap: 6px; }
 .period-key { width: 11px; height: 11px; background: #a9d8c8; border: var(--hairline) solid #90b5a8; }
 .record-key { width: 4px; height: 4px; margin: 0 3px; background: #517b6d; }
@@ -192,7 +221,8 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 .records-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 17px 19px 15px; border-bottom: var(--hairline) solid var(--soft-line); background: #e5f2ed; }
 .records-header h2 { font-size: 1.3125rem; line-height: 1.2; }
 .record-count { margin-top: 5px; color: var(--muted); font-size: 0.75rem; }
-.records-header .primary { font-size: 1.375rem; min-width: 97px; }
+.records-header .primary { position: relative; font-size: 0.6875rem; width: 49px; min-height: 21px; padding: 2px 5px; }
+.records-header .primary::after { content: ""; position: absolute; inset: -12px 0; }
 .record-list { padding: 13px 15px 15px; }
 .empty {
   display: grid;
@@ -210,13 +240,12 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 .record-card { padding: 13px 12px; border: var(--hairline) solid var(--soft-line); background: #f7fbf9; }
 .record-card + .record-card { margin-top: 8px; }
 .record-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 8px; }
-.record-date { display: flex; align-items: center; gap: 8px; min-height: 32px; margin: -4px 0 -4px -5px; padding: 4px 5px; border: 0; background: transparent; font-size: 1.25rem; text-align: left; font-variant-numeric: tabular-nums; }
+.record-date { display: flex; align-items: center; gap: 8px; min-height: 32px; margin: -4px 0 -4px -5px; padding: 4px 5px; border: 0; background: transparent; font-size: 1.3125rem; text-align: left; }
 .record-date:hover { text-decoration: underline; text-decoration-thickness: var(--hairline); text-underline-offset: 3px; }
 .record-date .weekday { font-size: 0.75rem; font-weight: 400; color: var(--muted); }
 .edit-mark { display: inline-grid; place-items: center; width: 20px; height: 20px; color: var(--muted); font-size: 1rem; }
-.record-detail { display: grid; grid-template-columns: 2.9em minmax(0, 1fr); gap: 6px; font-size: 0.8125rem; line-height: 1.65; }
+.record-detail { display: grid; grid-template-columns: 2.9em minmax(0, 1fr); gap: 6px; color: var(--detail); font-size: 0.8125rem; line-height: 1.65; }
 .record-detail + .record-detail { margin-top: 4px; }
-.record-detail dt { color: var(--muted); font-weight: 400; }
 .record-detail dd { margin: 0; overflow-wrap: anywhere; }
 .record-flow { display: flex; align-items: center; gap: 3px; font-size: 0.75rem; font-weight: 400; color: var(--muted); }
 .record-flow > span:last-child { margin-left: 3px; }
@@ -240,7 +269,8 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
   background: #f8fcfa;
   font-size: 1rem;
 }
-.date-field input { min-width: 158px; }
+.date-field input { min-width: 158px; font-size: 1.125rem; }
+.date-field input::-webkit-datetime-edit { font-family: inherit; }
 .flow-field legend, .option-group legend { margin-bottom: 8px; font-size: 0.875rem; font-weight: 500; }
 .flow-options { display: flex; flex-wrap: wrap; gap: 5px; }
 .flow-level { position: relative; display: grid; width: 43px; height: 43px; place-items: center; border: var(--hairline) solid #a4beb4; background: #f5faf7; font-size: 1.3125rem; font-weight: 500; cursor: pointer; }
@@ -248,11 +278,11 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 .flow-level:has(:focus-visible) { outline: var(--outline) dashed var(--ink); outline-offset: 3px; }
 .flow-level input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
 .flow-level .drop { pointer-events: none; }
-.option-group { margin-top: 24px; }
+.option-group { margin-top: 24px; color: var(--detail); }
 .chips { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
 .chip { display: inline-flex; align-items: center; gap: 5px; min-height: 39px; padding: 5px 9px; border: var(--hairline) solid #99b7ad; background: #f5faf7; font-size: 0.875rem; text-align: left; overflow-wrap: anywhere; }
 .chip:hover { background: #e4f2ec; }
-.chip[aria-pressed="true"] { background: #c1e1d5; border-color: #6c9a8c; box-shadow: inset 0 -.67px #9bc7b8; font-weight: 400; }
+.chip[aria-pressed="true"] { background: #c1e1d5; border-color: #6c9a8c; box-shadow: inset 0 -.67px #9bc7b8; color: #456559; font-weight: 400; }
 .chip[aria-pressed="true"]::before { content: ""; width: 5px; height: 5px; background: #537f70; flex: none; }
 .chip.custom { border-style: dashed; }
 .custom-chip { display: flex; width: 100%; gap: 6px; margin-top: 3px; }
@@ -264,9 +294,7 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 
 @media (max-width: 730px) {
   .app-view { width: calc(100% - 32px); padding-bottom: 28px; }
-  .topbar { min-height: 50px; }
-  .brand-name { font-size: 1.5625rem; }
-  .page-heading { margin: 23px 0 12px; }
+  .topbar { min-height: 58px; }
   .dashboard-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .calendar-content { padding-top: 10px; }
   .calendar-nav { padding-bottom: 6px; }
@@ -281,8 +309,7 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 @media (max-width: 380px) {
   .console { padding-inline: 16px; }
   .bezel { padding-inline: 7px; }
-  .record-date { font-size: 1.0625rem; }
-  .today-button { font-size: 0.875rem; }
+  .record-date { font-size: 1.125rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

@@ -24,6 +24,34 @@ function element(tag, className, text) {
   return node;
 }
 
+const wordmarkLetters = {
+  m: ["00000", "00000", "11010", "10101", "10101", "10101", "10101"],
+  o: ["00000", "00000", "01110", "10001", "10001", "10001", "01110"],
+  n: ["00000", "00000", "11110", "10001", "10001", "10001", "10001"],
+  d: ["00001", "00001", "01111", "10001", "10001", "10001", "01111"],
+};
+
+for (const wordmark of document.querySelectorAll(".wordmark")) {
+  const name = wordmark.textContent.trim();
+  const letters = Array.from(name, (character, index) => {
+    const letter = element("span", "dot-letter");
+    const dots = [];
+    wordmarkLetters[character].forEach((row, y) => {
+      Array.from(row).forEach((dot, x) => {
+        if (dot === "1") dots.push(`calc(var(--dot-step) * ${x}) calc(var(--dot-step) * ${y}) currentColor`);
+      });
+    });
+    letter.style.setProperty("--letter-index", index);
+    letter.style.setProperty("--letter-dots", dots.join(", "));
+    return letter;
+  });
+  const display = element("span", "wordmark-dots");
+  display.setAttribute("aria-hidden", "true");
+  display.append(...letters);
+  wordmark.setAttribute("aria-label", name);
+  wordmark.replaceChildren(display);
+}
+
 const lockView = get("lock-view");
 const appView = get("app-view");
 const dashboard = get("dashboard");
@@ -125,7 +153,7 @@ get("unlock-form").addEventListener("submit", async (event) => {
   showDashboard();
   lockView.hidden = true;
   appView.hidden = false;
-  dashboard.querySelector("h1").focus();
+  get("brand-name").focus();
 });
 
 function renderCalendar() {
@@ -220,7 +248,7 @@ function showDashboard() {
 
 function returnToDashboard() {
   showDashboard();
-  dashboard.querySelector("h1").focus();
+  get("brand-name").focus();
   window.scrollTo(0, 0);
 }
 
