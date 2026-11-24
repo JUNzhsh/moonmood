@@ -128,18 +128,6 @@ get("unlock-form").addEventListener("submit", async (event) => {
   dashboard.querySelector("h1").focus();
 });
 
-get("lock-button").addEventListener("click", () => {
-  appView.hidden = true;
-  lockView.hidden = false;
-  journal = emptyJournal();
-  editing = null;
-  get("record-list").replaceChildren();
-  get("calendar-days").replaceChildren();
-  get("record-form").reset();
-  groups.forEach(({ elementId }) => get(elementId).replaceChildren());
-  pin.focus();
-});
-
 function renderCalendar() {
   const today = dateKey();
   const year = visibleMonth.getFullYear();
@@ -176,7 +164,7 @@ function renderCalendar() {
 function renderRecord(key, entry) {
   const card = element("article", "record-card");
   const head = element("div", "record-head");
-  const button = element("button", "record-date pixel");
+  const button = element("button", "record-date");
   button.type = "button";
   button.setAttribute("aria-label", `编辑 ${key} 的记录`);
   button.append(element("time", "", key.replaceAll("-", ".")), element("span", "weekday", weekdays.format(calendarDate(key))));

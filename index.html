@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#e4eacc">
+  <meta name="theme-color" content="#deeee9">
   <meta name="description" content="MoonMood 像素风经期手账，记录流量、症状和用药。">
   <meta name="apple-mobile-web-app-title" content="MoonMood">
   <title>MoonMood · 经期手账</title>
   <link rel="icon" href="./assets/moon.png" type="image/png">
   <link rel="apple-touch-icon" href="./assets/moon.png">
-  <link rel="stylesheet" href="./styles.css">
-  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./styles.css?v=2">
+  <script type="module" src="./app.js?v=2"></script>
 </head>
 <body>
   <main id="lock-view" class="lock-view">
@@ -20,14 +20,14 @@
         <div class="bezel-top" aria-hidden="true"><span class="power"></span><span class="bezel-line"></span></div>
         <form id="unlock-form" class="lcd">
           <div class="lock-moon" aria-hidden="true"><i class="pixel-moon"></i><i class="sparkle"></i><i class="sparkle tiny"></i></div>
-          <h1 class="pixel">MOONMOOD</h1>
+          <h1>moonmood</h1>
           <label for="pin">输入四位密码</label>
           <div class="pin-pad">
             <input id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-describedby="pin-error" required>
             <div class="pin-slots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
           </div>
           <p id="pin-error" class="pin-error" role="status"></p>
-          <button class="button primary start" type="submit"><span class="triangle"></span><span class="pixel">START</span><span>进入</span></button>
+          <button class="button primary start" type="submit"><span class="triangle"></span><span class="start-label">START</span><span>进入</span></button>
         </form>
         <div class="bezel-bottom" aria-hidden="true"></div>
       </div>
@@ -36,13 +36,7 @@
   </main>
 
   <div id="app-view" class="app-view" hidden>
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-icon" aria-hidden="true"><i class="pixel-moon"></i></div>
-        <div><div class="brand-name pixel">MOONMOOD</div><div class="brand-caption">经期手账</div></div>
-      </div>
-      <button id="lock-button" class="button quiet" type="button"><i class="lock-icon" aria-hidden="true"></i>锁定</button>
-    </header>
+    <header class="topbar"><span class="brand-name">moonmood</span></header>
 
     <main id="dashboard" class="dashboard">
       <div class="page-heading">
@@ -55,7 +49,7 @@
           <div class="calendar-content">
             <div class="calendar-nav">
               <button id="previous-month" class="button square" type="button" aria-label="上个月"><i class="arrow left" aria-hidden="true"></i></button>
-              <h3 id="month-title" class="pixel" aria-live="polite"></h3>
+              <h3 id="month-title" aria-live="polite"></h3>
               <button id="next-month" class="button square" type="button" aria-label="下个月"><i class="arrow" aria-hidden="true"></i></button>
             </div>
             <div class="calendar-week" aria-hidden="true"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
@@ -67,7 +61,7 @@
         <section class="records panel" aria-labelledby="records-title">
           <div class="records-header">
             <div><h2 id="records-title">记录</h2><p id="record-count" class="record-count"></p></div>
-            <button id="add-button" class="button primary pixel" type="button" aria-label="添加记录">+ Add</button>
+            <button id="add-button" class="button primary" type="button" aria-label="添加记录">+ Add</button>
           </div>
           <div id="record-list" class="record-list"></div>
         </section>
