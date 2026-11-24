@@ -1,4 +1,7 @@
+import { createJournalSync, createPairingCode, normalizePairingCode, saveJournalEntry } from "./journal-sync.js?v=1";
+
 const STORAGE_KEY = "moonmood:journal:v1";
+const PAIRING_KEY = "moonmood:sync-code:v1";
 const PIN_HASH = "e72631d61de3f84f18dc081573e57313b236a2cbb4ade3e453407f0de19f99a0";
 const groups = [
   {
@@ -63,9 +66,13 @@ const entryDate = get("entry-date");
 const entryError = get("entry-error");
 const dashboardStatus = get("dashboard-status");
 const weekdays = new Intl.DateTimeFormat("zh-CN", { weekday: "short" });
+const syncUrl = document.querySelector('meta[name="moonmood-sync-url"]').content;
+const syncKey = document.querySelector('meta[name="moonmood-sync-key"]').content;
 let visibleMonth = new Date();
 let journal = emptyJournal();
 let editing = null;
+let syncing = false;
+let syncAgain = false;
 
 function dateKey(date = new Date()) {
   const year = String(date.getFullYear()).padStart(4, "0");
@@ -99,6 +106,113 @@ function refreshJournal() {
   } catch {
     dashboardStatus.textContent = "暂时无法读取记录，请检查浏览器的存储设置。";
   }
+}
+
+const synchronize = syncUrl && syncKey ? createJournalSync({
+  url: syncUrl,
+  publicKey: syncKey,
+  readLocal: readJournal,
+  writeLocal(updated) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    journal = updated;
+    if (!dashboard.hidden && !appView.hidden) renderDashboard();
+  },
+}) : null;
+
+function readPairingCode() {
+  try {
+    const code = localStorage.getItem(PAIRING_KEY);
+    return code ? normalizePairingCode(code) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setSyncStatus(message, failed = false) {
+  get("sync-status").textContent = message;
+  get("sync-button").textContent = failed ? "同步异常" : "同步";
+  get("sync-button").title = message;
+}
+
+function renderSyncSetup(code) {
+  get("sync-setup").hidden = Boolean(code);
+  get("sync-connected").hidden = !code;
+  get("sync-code").value = "";
+  get("sync-code-row").hidden = true;
+  get("sync-show-code").setAttribute("aria-expanded", "false");
+  get("sync-show-code").textContent = "显示配对码";
+}
+
+async function syncJournal(pendingCode, create = false) {
+  if (!synchronize || appView.hidden) return;
+  const code = pendingCode ?? readPairingCode();
+  if (!code) return;
+  if (syncing) {
+    syncAgain = true;
+    return;
+  }
+
+  syncing = true;
+  const controls = [get("sync-create"), get("sync-now"), get("sync-join").querySelector("button")];
+  controls.forEach((control) => { control.disabled = true; });
+  setSyncStatus("正在加密同步…");
+  try {
+    await synchronize(code, { create });
+    if (pendingCode) {
+      localStorage.setItem(PAIRING_KEY, code);
+      get("sync-input").value = "";
+      renderSyncSetup(code);
+    }
+    setSyncStatus("记录已同步。");
+  } catch (error) {
+    const message = error instanceof TypeError || error.name === "AbortError"
+      ? "暂时无法连接同步服务。"
+      : error.message;
+    setSyncStatus(`${message} 本机记录仍可使用。`, true);
+  } finally {
+    syncing = false;
+    controls.forEach((control) => { control.disabled = false; });
+    if (syncAgain) {
+      syncAgain = false;
+      void syncJournal();
+    }
+  }
+}
+
+if (synchronize) {
+  const syncDialog = get("sync-dialog");
+  get("calendar-bars").hidden = true;
+  get("sync-button").hidden = false;
+  get("sync-button").addEventListener("click", () => {
+    renderSyncSetup(readPairingCode());
+    syncDialog.showModal();
+  });
+  syncDialog.addEventListener("close", () => { get("sync-code").value = ""; });
+  get("sync-create").addEventListener("click", () => void syncJournal(createPairingCode(), true));
+  get("sync-join").addEventListener("submit", (event) => {
+    event.preventDefault();
+    void syncJournal(get("sync-input").value);
+  });
+  get("sync-now").addEventListener("click", () => void syncJournal());
+  get("sync-show-code").addEventListener("click", (event) => {
+    const row = get("sync-code-row");
+    const reveal = row.hidden;
+    get("sync-code").value = reveal ? readPairingCode() ?? "" : "";
+    row.hidden = !reveal;
+    event.currentTarget.setAttribute("aria-expanded", String(reveal));
+    event.currentTarget.textContent = reveal ? "隐藏配对码" : "显示配对码";
+  });
+  get("sync-copy-code").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(get("sync-code").value);
+      setSyncStatus("配对码已复制。");
+    } catch {
+      get("sync-code").select();
+      setSyncStatus("请长按或使用键盘复制配对码。");
+    }
+  });
+  window.addEventListener("online", () => void syncJournal());
+  window.setInterval(() => { if (!document.hidden) void syncJournal(); }, 60000);
 }
 
 function updatePinSlots() {
@@ -154,6 +268,7 @@ get("unlock-form").addEventListener("submit", async (event) => {
   lockView.hidden = true;
   appView.hidden = false;
   get("brand-name").focus();
+  void syncJournal();
 });
 
 function renderCalendar() {
@@ -392,7 +507,7 @@ get("record-form").addEventListener("submit", (event) => {
       return;
     }
     if (original && JSON.stringify(updated.entries[original]) !== JSON.stringify(editing.originalEntry)) {
-      entryError.textContent = "这条记录已在另一标签页更新，请返回后重新打开。";
+      entryError.textContent = "这条记录已更新，请返回后重新打开。";
       return;
     }
 
@@ -401,8 +516,7 @@ get("record-form").addEventListener("submit", (event) => {
       entry[group] = [...editing.selected[group]];
       updated.custom[group] = [...new Set([...updated.custom[group], ...editing.custom[group]])];
     }
-    if (original && original !== key) delete updated.entries[original];
-    updated.entries[key] = entry;
+    saveJournalEntry(updated, original, key, entry);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     journal = updated;
   } catch {
@@ -413,6 +527,7 @@ get("record-form").addEventListener("submit", (event) => {
   visibleMonth = calendarDate(key);
   returnToDashboard();
   dashboardStatus.textContent = "记录已保存。";
+  void syncJournal();
 });
 
 window.addEventListener("storage", (event) => {
@@ -424,4 +539,5 @@ window.addEventListener("storage", (event) => {
 
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && !appView.hidden && !dashboard.hidden) renderDashboard();
+  if (!document.hidden) void syncJournal();
 });

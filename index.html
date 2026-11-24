@@ -9,8 +9,10 @@
   <title>MoonMood · 经期手账</title>
   <link rel="icon" href="./assets/moon.png" type="image/png">
   <link rel="apple-touch-icon" href="./assets/moon.png">
-  <link rel="stylesheet" href="./styles.css?v=3">
-  <script type="module" src="./app.js?v=3"></script>
+  <meta name="moonmood-sync-url" content="https://ksdyitqgfbpduirdyyvp.supabase.co">
+  <meta name="moonmood-sync-key" content="sb_publishable_Si1SNDReQ1cJl9ZRGjRYcA_XOamfHXB">
+  <link rel="stylesheet" href="./styles.css?v=4">
+  <script type="module" src="./app.js?v=4"></script>
 </head>
 <body>
   <main id="lock-view" class="lock-view">
@@ -41,7 +43,7 @@
     <main id="dashboard" class="dashboard">
       <div class="dashboard-grid">
         <section class="calendar panel" aria-labelledby="calendar-title">
-          <div class="panel-header"><h2 id="calendar-title">日历</h2><span class="lcd-bars" aria-hidden="true"></span></div>
+          <div class="panel-header"><h2 id="calendar-title">日历</h2><span id="calendar-bars" class="lcd-bars" aria-hidden="true"></span><button id="sync-button" class="button quiet sync-button" type="button" hidden>同步</button></div>
           <div class="calendar-content">
             <div class="calendar-nav">
               <button id="previous-month" class="button square" type="button" aria-label="上个月"><i class="arrow left" aria-hidden="true"></i></button>
@@ -97,6 +99,36 @@
       </section>
     </main>
   </div>
+
+  <dialog id="sync-dialog" class="panel sync-dialog" aria-labelledby="sync-title">
+    <div class="panel-header"><h2 id="sync-title">跨设备同步</h2></div>
+    <div class="sync-body">
+      <section id="sync-setup">
+        <p>首次使用时创建配对码，再在另一台设备输入。两台设备已有的记录会合并，并在浏览器内加密后上传。</p>
+        <button id="sync-create" class="button primary" type="button">创建配对码</button>
+        <form id="sync-join" class="sync-join">
+          <label for="sync-input">已有配对码</label>
+          <div class="sync-row">
+            <input id="sync-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+            <button class="button" type="submit">连接</button>
+          </div>
+        </form>
+      </section>
+      <section id="sync-connected" hidden>
+        <p>在另一台设备打开 MoonMood，选择「同步」并输入同一个配对码。</p>
+        <div class="sync-row">
+          <button id="sync-show-code" class="button primary" type="button" aria-expanded="false" aria-controls="sync-code-row">显示配对码</button>
+          <button id="sync-now" class="button" type="button">立即同步</button>
+        </div>
+        <div id="sync-code-row" class="sync-row" hidden>
+          <input id="sync-code" aria-label="配对码" type="text" readonly>
+          <button id="sync-copy-code" class="button" type="button">复制</button>
+        </div>
+      </section>
+      <p id="sync-status" role="status"></p>
+      <form method="dialog" class="sync-actions"><button class="button quiet">关闭</button></form>
+    </div>
+  </dialog>
 
   <template id="empty-records">
     <div class="empty">

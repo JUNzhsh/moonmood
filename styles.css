@@ -292,6 +292,19 @@ button:focus-visible, input:focus-visible { outline: var(--outline) dashed var(-
 .editor-actions { display: flex; justify-content: flex-end; gap: 10px; border-top: var(--hairline) solid var(--soft-line); margin-top: 22px; padding-top: 15px; }
 .noscript { padding: 16px; text-align: center; }
 
+.sync-button { min-height: 29px; padding: 3px 9px; font-size: 1.0625rem; }
+.sync-dialog { width: min(420px, calc(100% - 30px)); max-height: calc(100% - 30px); padding: 0; color: var(--ink); }
+.sync-dialog::backdrop { background: #173b334d; }
+.sync-body { padding: 16px; font-size: 1.125rem; line-height: 1.6; }
+.sync-body p { margin-bottom: 12px; }
+.sync-body .button { min-height: 38px; font-size: 1.125rem; }
+.sync-join { display: grid; gap: 5px; margin-top: 15px; }
+.sync-row, .sync-actions { display: flex; align-items: center; gap: 8px; }
+.sync-row + .sync-row { margin-top: 10px; }
+.sync-row input { width: 0; flex: 1; min-height: 38px; padding: 4px 8px; border: var(--hairline) solid var(--line); background: var(--paper); font-size: 16px; }
+.sync-actions { justify-content: flex-end; }
+#sync-status { margin: 12px 0; color: var(--muted); }
+
 @media (max-width: 730px) {
   .app-view { width: calc(100% - 32px); padding-bottom: 28px; }
   .topbar { min-height: 58px; }
